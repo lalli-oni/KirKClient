@@ -46,14 +46,14 @@ namespace KirKClient.Handler
             }
         }
 
-        public string listenForMessages()
+        public string listenForMessage()
         {
-            return sr.ReadToEnd();
+            return sr.ReadLine();
         }
 
         public void sendMessage(string inpString)
         {
-            sw.WriteLine(inpString + "\n");
+            sw.WriteLine(inpString);
         }
     }
 }

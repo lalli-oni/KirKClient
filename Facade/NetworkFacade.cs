@@ -16,14 +16,15 @@ namespace KirKClient.Facade
             isConnected = false;
             connectHandler = new ConnectionHandler();
         }
-        public void Connect()
+        public bool Connect()
         {
             isConnected = connectHandler.establishConnection();
+            return isConnected;
         }
 
-        public string receiveMessages()
+        public string receiveMessage()
         {
-            return connectHandler.listenForMessages();
+            return connectHandler.listenForMessage();
         }
 
         public void broadcastMessage(string inpString)

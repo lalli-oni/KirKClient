@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using KirKClient.Annotations;
 using KirKClient.Facade;
 using KirKClient.Handler;
@@ -19,6 +20,7 @@ namespace KirKClient.ViewModel
         private RelayCommand _connectCommand;
         private NetworkFacade _netFacade;
         private RelayCommand _sendMessageCommand;
+        private Task getMessagesTask;
 
         public ObservableCollection<string> ReceivedMessages
         {
@@ -58,11 +60,18 @@ namespace KirKClient.ViewModel
             _receivedMessages = new ObservableCollection<string>();
             _connectCommand = new RelayCommand(connectToServer);
             _sendMessageCommand = new RelayCommand(sendMessage);
-            Task getMessagesTask = Task.Run(() =>
+            getMessagesTask = new Task(() =>
             {
-                while (_netFacade.isConnected)
+                while (true)
                 {
-                    ReceivedMessages.Add(_netFacade.receiveMessages());
+                    string receivedMessage = _netFacade.receiveMessage();
+
+                    //Invokes the main thread and performs the action
+                    //Done because ObservableCollection doesn't allow updating outside of the invoking thread.
+                    Application.Current.Dispatcher.Invoke((Action)(() =>
+                    {
+                        ReceivedMessages.Add(receivedMessage);
+                    }));
                 }
             });
             
@@ -70,7 +79,10 @@ namespace KirKClient.ViewModel
 
         public void connectToServer()
         {
-            _netFacade.Connect();
+            if (_netFacade.Connect())
+            {
+                getMessagesTask.Start();
+            }
         }
 
         public void sendMessage()
