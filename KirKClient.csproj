@@ -67,6 +67,7 @@
     <Compile Include="Handler\AddressService.cs" />
     <Compile Include="Handler\ConnectionHandler.cs" />
     <Compile Include="Handler\RelayCommand.cs" />
+    <Compile Include="Properties\Annotations.cs" />
     <Compile Include="ViewModel\ChatViewModel.cs" />
     <Compile Include="View\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>

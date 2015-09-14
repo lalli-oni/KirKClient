@@ -16,7 +16,10 @@
                 <Button x:Name="connectButton" Command="{Binding ConnectCommand}" FontSize="20">Connect</Button>
             </ListView>
             <ListView x:Name="receivedMessagesListView" Height="200" Width="400"  ItemsSource="{Binding ReceivedMessages, Mode=TwoWay}" />
-            <TextBox x:Name="inputMessageTextBox" Text="{Binding InputMessage, Mode=TwoWay}" Width="400" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
+            <StackPanel Orientation="Horizontal">
+                <TextBox x:Name="inputMessageTextBox" Text="{Binding InputMessage, Mode=TwoWay}" Width="370" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
+                <Button x:Name="sendMessageButton" Command="{Binding SendMessageCommand}" Width="30">Send</Button>
+            </StackPanel>
         </ListView>
     </Grid>
 </Window>

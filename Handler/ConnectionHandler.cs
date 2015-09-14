@@ -35,9 +35,8 @@ namespace KirKClient.Handler
                 client.Connect(serverEndPoint);
                 stream = client.GetStream();
                 sr = new StreamReader(stream);
-                sw = new StreamWriter(stream);
+                sw = new StreamWriter(stream) {AutoFlush = true};
                 sw.WriteLine("192.168.0.1" + "~" + "Bob");
-                sw.Flush();
                 return true;
             }
             catch (Exception e)
@@ -50,6 +49,11 @@ namespace KirKClient.Handler
         public string listenForMessages()
         {
             return sr.ReadToEnd();
+        }
+
+        public void sendMessage(string inpString)
+        {
+            sw.WriteLine(inpString + "\n");
         }
     }
 }

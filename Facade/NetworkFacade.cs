@@ -25,5 +25,10 @@ namespace KirKClient.Facade
         {
             return connectHandler.listenForMessages();
         }
+
+        public void broadcastMessage(string inpString)
+        {
+            connectHandler.sendMessage(inpString);
+        }
     }
 }
