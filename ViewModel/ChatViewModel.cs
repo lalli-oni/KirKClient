@@ -9,7 +9,7 @@ using KirKClient.Handler;
 
 namespace KirKClient.ViewModel
 {
-    class ChatViewModel
+    public class ChatViewModel
     {
         private ObservableCollection<string> _receivedMessages;
         private string _inputMessage;
@@ -39,6 +39,14 @@ namespace KirKClient.ViewModel
             _netFacade = new NetworkFacade();
             _receivedMessages = new ObservableCollection<string>();
             _connectCommand = new RelayCommand(connectToServer);
+            Task getMessagesTask = Task.Run(() =>
+            {
+                while (_netFacade.isConnected)
+                {
+                    ReceivedMessages.Add(_netFacade.receiveMessages());
+                }
+            });
+            
         }
 
         public void connectToServer()

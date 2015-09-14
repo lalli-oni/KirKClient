@@ -11,13 +11,9 @@ namespace KirkClient.Handler
     {
         public IPAddress getIP(string hostName)
         {
-
-            string name = Dns.GetHostName();
             try
             {
-                IPAddress[] addrs = Dns.Resolve(name).AddressList;
-                foreach (IPAddress addr in addrs)
-                    Console.WriteLine("{0}/{1}", name, addr);
+                IPAddress[] addrs = Dns.GetHostAddresses(hostName);
                 return addrs[0];
             }
             catch (Exception e)
@@ -29,13 +25,9 @@ namespace KirkClient.Handler
 
         public async Task<IPAddress> getIPAsync(string hostName)
         {
-
-            string name = Dns.GetHostName();
             try
             {
-                IPAddress[] addrs = Dns.Resolve(name).AddressList;
-                foreach (IPAddress addr in addrs)
-                    Console.WriteLine("{0}/{1}", name, addr);
+                IPAddress[] addrs = await Dns.GetHostAddressesAsync(hostName);
                 return addrs[0];
             }
             catch (Exception e)

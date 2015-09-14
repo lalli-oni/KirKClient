@@ -9,14 +9,21 @@ namespace KirKClient.Facade
 {
     class NetworkFacade
     {
+        public bool isConnected;
         private ConnectionHandler connectHandler;
         public NetworkFacade()
         {
+            isConnected = false;
             connectHandler = new ConnectionHandler();
         }
         public void Connect()
         {
-            connectHandler.establishConnection();
+            isConnected = connectHandler.establishConnection();
+        }
+
+        public string receiveMessages()
+        {
+            return connectHandler.listenForMessages();
         }
     }
 }
