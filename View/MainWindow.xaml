@@ -11,7 +11,12 @@
         <Grid.DataContext>
             <ViewModel:ChatViewModel/>
         </Grid.DataContext>
-        <ListView x:Name="receivedMessagesListView" ItemsSource="{Binding ReceivedMessages, Mode=TwoWay}"/>
-        <TextBox x:Name="inputMessageTextBox" Text="{Binding InputMessage, Mode=TwoWay}"/>
+        <ListView x:Name="MainApp">
+            <ListView x:Name="TopBar">
+                <Button x:Name="connectButton" Command="{Binding ConnectCommand}" FontSize="20">Connect</Button>
+            </ListView>
+            <ListView x:Name="receivedMessagesListView" Height="200" Width="400"  ItemsSource="{Binding ReceivedMessages, Mode=TwoWay}" />
+            <TextBox x:Name="inputMessageTextBox" Text="{Binding InputMessage, Mode=TwoWay}" Width="400" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
+        </ListView>
     </Grid>
 </Window>
