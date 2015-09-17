@@ -8,7 +8,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using KirKClient.Annotations;
-using KirKClient.Facade;
 using KirKClient.Handler;
 
 namespace KirKClient.ViewModel
@@ -20,6 +19,7 @@ namespace KirKClient.ViewModel
         private RelayCommand _connectCommand;
         private ConnectionHandler _connection;
         private RelayCommand _sendMessageCommand;
+        private string _userName;
         private Task getMessagesTask;
 
         public ObservableCollection<string> ReceivedMessages
@@ -68,7 +68,7 @@ namespace KirKClient.ViewModel
 
                     //Invokes the main thread and performs the action
                     //Done because ObservableCollection doesn't allow updating outside of the invoking thread.
-                    if (receivedMessage != null)
+                    if (receivedMessage.StartsWith("Error:"))
                     {
                         Application.Current.Dispatcher.Invoke((Action)(() =>
                         {
@@ -82,10 +82,34 @@ namespace KirKClient.ViewModel
 
         public void connectToServer()
         {
-            if (_connection.EstablishConnection())
+            ReceivedMessages.Add("Please input your desired username...");
+            Task connectingTask = Task.Run(() =>
             {
-                getMessagesTask.Start();
-            }
+                int i = 0;
+                if (_connection.EstablishConnection().Result || i < 100)
+                {
+                    i = 0;
+                    while (_inputMessage == null || i < 1000)
+                    {
+                        i ++;
+                    }
+                    if (i < 90)
+                    {
+                        ReceivedMessages.Add("Connection timeout. Please try re-connecting.");
+                        return;
+                    }
+                    _userName = InputMessage;
+                    InputMessage = "";
+                    if (_connection.RegisterUsername(_userName).Result)
+                    {
+                        getMessagesTask.Start();
+                    }
+                }
+                else
+                {
+                    ReceivedMessages.Add("Connection Failed.");
+                }
+            });
         }
 
         public void sendMessage()

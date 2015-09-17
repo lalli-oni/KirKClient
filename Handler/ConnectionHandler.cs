@@ -21,6 +21,7 @@ namespace KirKClient.Handler
         private NetworkStream stream;
         private StreamReader sr;
         private StreamWriter sw;
+        public bool isConnected;
 
         public ConnectionHandler()
         {
@@ -28,7 +29,7 @@ namespace KirKClient.Handler
             client = new TcpClient();
         }
 
-        public bool EstablishConnection()
+        public async Task<bool> EstablishConnection()
         {
             try
             {
@@ -36,12 +37,29 @@ namespace KirKClient.Handler
                 stream = client.GetStream();
                 sr = new StreamReader(stream);
                 sw = new StreamWriter(stream) {AutoFlush = true};
-                sw.WriteLine("192.168.0.1" + "~" + "Bob");
+                sw.WriteLine("192.168.0.1");
+                isConnected = true;
                 return true;
             }
             catch (Exception e)
             {
                 MessageBox.Show("Connection failed!\n " + e.Message);
+                isConnected = false;
+                return false;
+            }
+        }
+
+        public async Task<bool> RegisterUsername(string userName)
+        {
+            try
+            {
+                await sw.WriteLineAsync(userName);
+                return true;
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Connection failed!\n " + e.Message);
+                isConnected = false;
                 return false;
             }
         }
