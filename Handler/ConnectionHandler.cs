@@ -24,11 +24,11 @@ namespace KirKClient.Handler
 
         public ConnectionHandler()
         {
-            serverEndPoint = new IPEndPoint(IPAddress.Parse("10.200.128.141"), 6789);
+            serverEndPoint = new IPEndPoint(IPAddress.Parse("10.200.128.171"), 6789);
             client = new TcpClient();
         }
 
-        public bool establishConnection()
+        public bool EstablishConnection()
         {
             try
             {
@@ -46,12 +46,19 @@ namespace KirKClient.Handler
             }
         }
 
-        public string listenForMessage()
+        public string ListenForMessage()
         {
-            return sr.ReadLine();
+            try
+            {
+                return sr.ReadLine();
+            }
+            catch (Exception e)
+            {
+                return "Error: " + e.Message;
+            }
         }
 
-        public void sendMessage(string inpString)
+        public void SendMessage(string inpString)
         {
             sw.WriteLine(inpString);
         }

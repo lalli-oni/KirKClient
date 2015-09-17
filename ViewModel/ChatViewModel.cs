@@ -18,7 +18,7 @@ namespace KirKClient.ViewModel
         private ObservableCollection<string> _receivedMessages;
         private string _inputMessage;
         private RelayCommand _connectCommand;
-        private NetworkFacade _netFacade;
+        private ConnectionHandler _connection;
         private RelayCommand _sendMessageCommand;
         private Task getMessagesTask;
 
@@ -56,7 +56,7 @@ namespace KirKClient.ViewModel
 
         public ChatViewModel()
         {
-            _netFacade = new NetworkFacade();
+            _connection = new ConnectionHandler();
             _receivedMessages = new ObservableCollection<string>();
             _connectCommand = new RelayCommand(connectToServer);
             _sendMessageCommand = new RelayCommand(sendMessage);
@@ -64,14 +64,17 @@ namespace KirKClient.ViewModel
             {
                 while (true)
                 {
-                    string receivedMessage = _netFacade.receiveMessage();
+                    string receivedMessage = _connection.ListenForMessage();
 
                     //Invokes the main thread and performs the action
                     //Done because ObservableCollection doesn't allow updating outside of the invoking thread.
-                    Application.Current.Dispatcher.Invoke((Action)(() =>
+                    if (receivedMessage != null)
                     {
-                        ReceivedMessages.Add(receivedMessage);
-                    }));
+                        Application.Current.Dispatcher.Invoke((Action)(() =>
+                        {
+                            ReceivedMessages.Add(receivedMessage);
+                        }));
+                    }
                 }
             });
             
@@ -79,7 +82,7 @@ namespace KirKClient.ViewModel
 
         public void connectToServer()
         {
-            if (_netFacade.Connect())
+            if (_connection.EstablishConnection())
             {
                 getMessagesTask.Start();
             }
@@ -87,7 +90,10 @@ namespace KirKClient.ViewModel
 
         public void sendMessage()
         {
-            _netFacade.broadcastMessage(_inputMessage);
+            if (_inputMessage != null)
+            {
+                _connection.SendMessage(_inputMessage);
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
