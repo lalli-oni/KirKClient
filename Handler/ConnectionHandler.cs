@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Runtime.Remoting;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Converters;
@@ -78,6 +79,11 @@ namespace KirKClient.Handler
 
         public void SendMessage(string inpString)
         {
+            //TODO: Encountered an error saying stream was still in use. Maybe need a buffer for this.
+            if (!sw.BaseStream.CanWrite)
+            {
+                Thread.Sleep(100);
+            }
             sw.WriteLine(inpString);
         }
 

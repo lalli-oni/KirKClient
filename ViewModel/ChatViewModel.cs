@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -14,7 +15,7 @@ namespace KirKClient.ViewModel
 {
     public class ChatViewModel : INotifyPropertyChanged
     {
-        private ObservableCollection<string> _receivedMessages;
+        private ConcurrentDictionary<string, string> _receivedMessages;
         private string _inputMessage;
         private RelayCommand _connectCommand;
         private RelayCommand _disconnectCommand;
@@ -23,7 +24,7 @@ namespace KirKClient.ViewModel
         private string _userName;
         private Task getMessagesTask;
 
-        public ObservableCollection<string> ReceivedMessages
+        public ConcurrentDictionary<string, string> ReceivedMessages
         {
             get { return _receivedMessages; }
             set
@@ -47,7 +48,7 @@ namespace KirKClient.ViewModel
         {
             get
             {
-                if (_connection.isConnected)
+                if (!_connection.isConnected)
                 {
                     return _connectCommand;
                 }
@@ -65,30 +66,26 @@ namespace KirKClient.ViewModel
         public ChatViewModel()
         {
             _connection = new ConnectionHandler();
-            _receivedMessages = new ObservableCollection<string>();
-            _connectCommand = new RelayCommand(connectToServer);
+            _receivedMessages = new ConcurrentDictionary<string, string>();
+            _connectCommand = new RelayCommand(ConnectToServer);
             _disconnectCommand = new RelayCommand(_connection.Disconnect);
-            _sendMessageCommand = new RelayCommand(sendMessage);
+            _sendMessageCommand = new RelayCommand(SendMessage);
             getMessagesTask = new Task(() =>
             {
                 while (true)
                 {
                     string receivedMessage = _connection.ListenForMessage();
-
-                    //Invokes the main thread and performs the action
-                    //Done because ObservableCollection doesn't allow updating outside of the invoking thread.
-                    Application.Current.Dispatcher.Invoke((Action)(() =>
-                    {
-                        ReceivedMessages.Add(receivedMessage);
-                    }));
+                    string[] splitMsg = receivedMessage.Split('~');
+                    ReceivedMessages.TryAdd(splitMsg[0], splitMsg[1]);
+                    OnPropertyChanged(nameof(ReceivedMessages));
                 }
             });
             
         }
 
-        public void connectToServer()
+        public void ConnectToServer()
         {
-            ReceivedMessages.Add("Please input your desired username...");
+            ReceivedMessages.TryAdd("","Please input your desired username...");
             Task connectingTask = Task.Run(() =>
             {
                 int i = 0;
@@ -102,7 +99,8 @@ namespace KirKClient.ViewModel
                     if (i < 90)
                     {
                         _connection.Disconnect();
-                        ReceivedMessages.Add("Connection timeout. Please try re-connecting.");
+                        ReceivedMessages.TryAdd("","Connection timeout. Please try re-connecting.");
+                        OnPropertyChanged(nameof(ReceivedMessages));
                         return;
                     }
                     _userName = InputMessage;
@@ -115,12 +113,13 @@ namespace KirKClient.ViewModel
                 else
                 {
                     _connection.Disconnect();
-                    ReceivedMessages.Add("Connection Failed.");
+                    ReceivedMessages.TryAdd("","Connection Failed.");
+                    OnPropertyChanged(nameof(ReceivedMessages));
                 }
             });
         }
 
-        public void sendMessage()
+        public void SendMessage()
         {
             if (_inputMessage != null)
             {
