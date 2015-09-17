@@ -17,6 +17,7 @@ namespace KirKClient.ViewModel
         private ObservableCollection<string> _receivedMessages;
         private string _inputMessage;
         private RelayCommand _connectCommand;
+        private RelayCommand _disconnectCommand;
         private ConnectionHandler _connection;
         private RelayCommand _sendMessageCommand;
         private string _userName;
@@ -44,7 +45,14 @@ namespace KirKClient.ViewModel
 
         public RelayCommand ConnectCommand
         {
-            get { return _connectCommand; }
+            get
+            {
+                if (_connection.isConnected)
+                {
+                    return _connectCommand;
+                }
+                return _disconnectCommand;
+            }
             set { _connectCommand = value; }
         }
 
@@ -59,6 +67,7 @@ namespace KirKClient.ViewModel
             _connection = new ConnectionHandler();
             _receivedMessages = new ObservableCollection<string>();
             _connectCommand = new RelayCommand(connectToServer);
+            _disconnectCommand = new RelayCommand(_connection.Disconnect);
             _sendMessageCommand = new RelayCommand(sendMessage);
             getMessagesTask = new Task(() =>
             {
@@ -95,6 +104,7 @@ namespace KirKClient.ViewModel
                     }
                     if (i < 90)
                     {
+                        _connection.Disconnect();
                         ReceivedMessages.Add("Connection timeout. Please try re-connecting.");
                         return;
                     }
@@ -107,6 +117,7 @@ namespace KirKClient.ViewModel
                 }
                 else
                 {
+                    _connection.Disconnect();
                     ReceivedMessages.Add("Connection Failed.");
                 }
             });
