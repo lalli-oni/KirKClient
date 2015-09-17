@@ -80,5 +80,10 @@ namespace KirKClient.Handler
         {
             sw.WriteLine(inpString);
         }
+
+        public void Disconnect()
+        {
+            client.Close();
+        }
     }
 }

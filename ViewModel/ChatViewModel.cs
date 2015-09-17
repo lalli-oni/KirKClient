@@ -77,13 +77,10 @@ namespace KirKClient.ViewModel
 
                     //Invokes the main thread and performs the action
                     //Done because ObservableCollection doesn't allow updating outside of the invoking thread.
-                    if (receivedMessage.StartsWith("Error:"))
+                    Application.Current.Dispatcher.Invoke((Action)(() =>
                     {
-                        Application.Current.Dispatcher.Invoke((Action)(() =>
-                        {
-                            ReceivedMessages.Add(receivedMessage);
-                        }));
-                    }
+                        ReceivedMessages.Add(receivedMessage);
+                    }));
                 }
             });
             
