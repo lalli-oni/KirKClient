@@ -63,7 +63,6 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Facade\NetworkFacade.cs" />
     <Compile Include="Handler\AddressService.cs" />
     <Compile Include="Handler\ConnectionHandler.cs" />
     <Compile Include="Handler\RelayCommand.cs" />
